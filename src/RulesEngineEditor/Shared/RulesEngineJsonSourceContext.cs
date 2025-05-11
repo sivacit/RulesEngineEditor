@@ -15,6 +15,9 @@ namespace RulesEngineEditor.Shared
     [JsonSerializable(typeof(RuleData))]
     [JsonSerializable(typeof(RuleActions))]
     [JsonSerializable(typeof(List<WorkflowData>))] // Added for WorkflowData list
+    [JsonSerializable(typeof(List<Workflow>))]
+    [JsonSerializable(typeof(List<InputRuleParameterDictionary>))] // ✅ Add this
+
     public partial class RulesEngineJsonSourceContext : JsonSerializerContext
     {
         // Removed manually implemented members.

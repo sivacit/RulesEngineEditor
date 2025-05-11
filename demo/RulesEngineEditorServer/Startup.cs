@@ -16,6 +16,10 @@ using System.Threading.Tasks;
 using RulesEngineEditor.Services;
 using RulesEngineEditor.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using Microsoft.AspNetCore.Components;
+
 
 namespace RulesEngineEditorServer
 {
@@ -26,6 +30,8 @@ namespace RulesEngineEditorServer
             Configuration = configuration;
         }
 
+        
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -34,10 +40,21 @@ namespace RulesEngineEditorServer
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddControllers(); // ✅ Register API controllers
+
+
             services.AddSingleton<WeatherForecastService>();
+            services.AddDbContext<RulesDbContext>(options => options.UseSqlite("Data Source=rules.db"));
 
             //services.AddDbContext<RulesEngineEditorDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RulesEngineEditorDB")));
             services.AddDbContextFactory<RulesEngineEditorDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("RulesEngineEditorDB")), ServiceLifetime.Transient);
+
+            services.AddScoped<HttpClient>(sp =>
+            {
+                var navigationManager = sp.GetRequiredService<NavigationManager>();
+                return new HttpClient { BaseAddress = new Uri(navigationManager.BaseUri) };
+            });
 
             services.AddRulesEngineEditor();
         }
@@ -64,6 +81,7 @@ namespace RulesEngineEditorServer
             app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapControllers(); // ✅ Enable API endpoints like /api/rules
             });
         }
     }

@@ -6,13 +6,17 @@
 @using RulesEngineEditor.Components
 @inject NavigationManager NavigationManager
 @inject RulesEngineEditor.Services.WorkflowService WorkflowService
+@inject HttpClient Http
 @implements IDisposable
 
 <sp_grid_tabs>
     <div>
-        <button class="reeditor_menubutton @IsPressed(ShowWorkflows, "menubutton_depressed")" @onclick="(() => ShowWorkflows = true)">Workflows</button>
-    </div><div>
-        <button class="reeditor_menubutton @IsPressed(!ShowWorkflows, "menubutton_depressed")" @onclick="(() => ShowWorkflows = false)">Input Rule Parameters</button>
+        <button class="reeditor_menubutton @IsPressed(ShowWorkflows, "menubutton_depressed")"
+            @onclick="(() => ShowWorkflows = true)">Workflows</button>
+    </div>
+    <div>
+        <button class="reeditor_menubutton @IsPressed(!ShowWorkflows, "menubutton_depressed")"
+            @onclick="(() => ShowWorkflows = false)">Input Rule Parameters</button>
     </div>
 </sp_grid_tabs>
 <br />
@@ -34,8 +38,10 @@
 }
 <div hidden="@(!ShowWorkflows)">
     <EditForm Model="currentWorkflow" class="reeditor_button">
-        <InputSelect @bind-Value="CurrentWorkflowName" class="reeditor_button" title="Current Workflow">
-            @foreach (var wf in GetWorkflows())
+        <InputSelect @bind-Value="CurrentWorkflowName" class="reeditor_button" title="Current Workflow"
+            @onchange="OnWorkflowSelected">
+            <option disabled selected value="">-- Select Workflow --</option>
+            @foreach (var wf in AvailableWorkflows)
             {
                 <option value="@wf.WorkflowName">@wf.WorkflowName</option>
             }
@@ -55,7 +61,9 @@
     }
     @if (IsButtonEnabled("ImportWorkflows"))
     {
-        <div class="reeditor_button"><InputFile title="Import Workflows" OnChange="@ImportWorkflows" />Import</div>
+        <div class="reeditor_button">
+            <InputFile title="Import Workflows" OnChange="@ImportWorkflows" />Import
+        </div>
 
         <span>&nbsp;</span>
     }
@@ -71,9 +79,11 @@
 
         <span>&nbsp;</span>
     }
-    <button class="reeditor_button @IsPressed(sort_wf, "button_depressed")" @onclick="(() => sort_wf = !sort_wf)">Arrange</button>
+    <button class="reeditor_button @IsPressed(sort_wf, "button_depressed")"
+        @onclick="(() => sort_wf = !sort_wf)">Arrange</button>
     <span>&nbsp;</span>
-    <button class="reeditor_button @IsPressed(WorkflowJSONHidden, "button_depressed")" @onclick="(() => WorkflowJSONHidden = !WorkflowJSONHidden)">Fullscreen</button>
+    <button class="reeditor_button @IsPressed(WorkflowJSONHidden, "button_depressed")"
+        @onclick="(() => WorkflowJSONHidden = !WorkflowJSONHidden)">Fullscreen</button>
     <span>&nbsp;</span>
 </div>
 
@@ -83,7 +93,9 @@
         <div>
             @if (sort_wf)
             {
-                <Dropzone TItem="WorkflowData" OnItemDrop="@((i)=>WorkflowDragEnd(i))" Items="@(CurrentWorkflowName == null || CurrentWorkflowName == "ALL" ? WorkflowService.Workflows : WorkflowService.Workflows.Where(w => w.WorkflowName == CurrentWorkflowName).ToList())" Class="reeditor_dragdrop">
+                <Dropzone TItem="WorkflowData" OnItemDrop="@((i) => WorkflowDragEnd(i))"
+                    Items="@(CurrentWorkflowName == null || CurrentWorkflowName == "ALL" ? WorkflowService.Workflows : WorkflowService.Workflows.Where(w => w.WorkflowName == CurrentWorkflowName).ToList())"
+                    Class="reeditor_dragdrop">
                     <WorkflowEditor workFlow="context" WorkflowDelete="DeleteWorkflow" />
                     <div class="sp_grid_workflow_children">
                         <h5>Rules</h5>
@@ -100,7 +112,9 @@
             }
             else
             {
-                @foreach (WorkflowData context in (CurrentWorkflowName == null || CurrentWorkflowName == "ALL" ? WorkflowService.Workflows : WorkflowService.Workflows.Where(w => w.WorkflowName == CurrentWorkflowName).ToList()))
+                @foreach (WorkflowData context in (CurrentWorkflowName == null || CurrentWorkflowName == "ALL" ?
+                        WorkflowService.Workflows : WorkflowService.Workflows.Where(w => w.WorkflowName ==
+                        CurrentWorkflowName).ToList()))
                 {
                     <WorkflowEditor workFlow="context" WorkflowDelete="DeleteWorkflow" />
                     <div class="sp_grid_workflow_children">
@@ -119,7 +133,8 @@
         </div>
         <div hidden="@WorkflowJSONHidden">
             <span class="JSONErrors">@workflowJSONErrors</span>
-            <textarea @bind="WorkflowsJSON" class="jsonTextArea" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+            <textarea @bind="WorkflowsJSON" class="jsonTextArea" autocomplete="off" autocorrect="off" autocapitalize="off"
+            spellcheck="false" />
         </div>
     </div>
     <div hidden="@(ShowWorkflows)">
@@ -137,11 +152,14 @@
         }
         @if (IsButtonEnabled("ImportInputs"))
         {
-            <div class="reeditor_button"><InputFile title="Import Inputs" OnChange="@ImportInputs" />Import</div>
+            <div class="reeditor_button">
+                <InputFile title="Import Inputs" OnChange="@ImportInputs" />Import
+            </div>
 
             <span>&nbsp;</span>
         }
-        <button class="reeditor_button @IsPressed(sort_ip, "button_depressed")" @onclick="(() => sort_ip = !sort_ip)">Arrange</button>
+        <button class="reeditor_button @IsPressed(sort_ip, "button_depressed")"
+            @onclick="(() => sort_ip = !sort_ip)">Arrange</button>
         <span>&nbsp;</span>
         @if (IsButtonEnabled("AddInput"))
         {
@@ -170,7 +188,8 @@
             </div>
             <div>
                 <span class="JSONErrors">@inputJSONErrors</span>
-                <textarea @bind="InputJSON" class="jsonTextArea" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <textarea @bind="InputJSON" class="jsonTextArea" autocomplete="off" autocorrect="off" autocapitalize="off"
+                spellcheck="false" />
             </div>
         </div>
     </div>
