@@ -171,6 +171,10 @@ namespace RulesEngineEditor.Pages
             SelectedWorkflowName = e.Value?.ToString();
             if (string.IsNullOrEmpty(SelectedWorkflowName))
                 return;
+            else{
+                CurrentWorkflowName = SelectedWorkflowName;
+                await LoadWorkflow(SelectedWorkflowName); // ✅ You must call this
+            }
 
             try
             {
